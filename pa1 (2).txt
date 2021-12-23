@@ -1,0 +1,91 @@
+.section .data
+input_prompt    :   .asciz  "Input a string: "
+input_spec      :   .asciz  "%[^\n]"
+length_spec     :   .asciz  "String length: %d\n"
+palindrome_spec :   .asciz  "String is a palindrome (T/F): %c\n"
+custom_spec: .asciz "x1 is %c"
+temp:	.space	8
+
+.section .text
+
+.global main
+
+main:
+	ldr x0, =input_prompt
+	bl printf
+
+	ldr x0, =input_spec
+	ldr x1, =temp
+	bl scanf
+
+	ldr x27, =temp
+	mov x26, xzr
+
+	#b exit
+	
+length:
+	ldrb w0, [x27]
+	cbz x0, exitlength
+	add x27, x27, #1
+	add x26, x26, #1
+	b length
+	
+
+	
+
+
+exitlength:
+
+	ldr x0, = length_spec
+	mov x1, x26
+	bl printf	
+	
+	mov x25, x26, lsr 1
+	mov x10,x26
+	#^length-1 ; x10 = length
+	mov x9,-1
+	
+	ldr x11, =temp
+	
+
+palindrome:
+
+
+
+
+sub x10, x10, 1
+add x9,x9,1
+
+sub x13,x9,x25
+cbz x13, exitP
+
+ldrb w3,[x11,x9]
+#^first index byte
+ldrb w4,[x11,x10]
+#^last index byte
+
+cmp w3, w4
+b.eq exitP
+b.ne exitF
+
+
+
+
+exitP:
+ldr x0, =palindrome_spec
+mov x1, 84
+bl printf
+b exit
+
+exitF:
+ldr x0, =palindrome_spec
+mov x1, 70
+bl printf
+b exit
+
+exit:
+    mov x0, 0
+    mov x8, 93
+    svc 0
+    ret
+	
